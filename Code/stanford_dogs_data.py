@@ -39,7 +39,7 @@ class DogImages(data.Dataset):
     folder = 'StanfordDogs'
     download_url_prefix = 'http://vision.stanford.edu/aditya86/ImageNetDogs'
 
-    def __init__(self, root, train = True, cropped=False, transform=None, target_transform=None, download=False):
+    def __init__(self, root, train=True, cropped=False, transform=None, target_transform=None, download=False):
         self.root = os.path.join(os.path.expanduser(root), 'StanfordDogs')
         self.train = train
         self.cropped = cropped
