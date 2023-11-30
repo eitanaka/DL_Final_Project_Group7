@@ -1,3 +1,13 @@
+"""
+Author: Kismat Khatri
+Date: Nov 28, 2023
+Class: DATS 6303 Deep Learning
+Instructor: Dr. Amir Jafari
+Assignment: Final Project
+
+
+"""
+
 
 import os
 import streamlit as st
