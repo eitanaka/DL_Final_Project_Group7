@@ -1,7 +1,7 @@
 """
-Author: Ei Tanaka
+Author: Ei Tanaka,Cody Yu
 Date: Nov 10, 2023
-Purpose: To load the Stanford Dogs dataset
+Purpose: To load the Stanford Dogs dataset and EDA analysis
 Reference: https://github.com/zrsmithson/Stanford-dogs/blob/master/data/stanford_dogs_data.py
 """
 
@@ -10,10 +10,13 @@ from PIL import Image
 from os.path import join
 import os
 import scipy.io
-
+import matplotlib.pyplot as plt
+import numpy as np
 import torch.utils.data as data
 from torchvision import transforms
 from torchvision.datasets.utils import download_url, list_dir, list_files
+import random
+import torch
 
 # =================================== Constants ===================================
 OR_PATH = os.getcwd()
@@ -39,7 +42,7 @@ class DogImages(data.Dataset):
     folder = 'StanfordDogs'
     download_url_prefix = 'http://vision.stanford.edu/aditya86/ImageNetDogs'
 
-    def __init__(self, root, train=True, cropped=False, transform=None, target_transform=None, download=False):
+    def __init__(self, root, train=True, cropped=False, transform=None, target_transform=None, download=True):
         self.root = os.path.join(os.path.expanduser(root), 'StanfordDogs')
         self.train = train
         self.cropped = cropped
@@ -269,9 +272,97 @@ class DogImages(data.Dataset):
 
         return counts
 
+    def show_samples(self, rows=3, cols=8):
+        num_images = rows * cols
+        fig, axes = plt.subplots(rows, cols, figsize=(cols * 2, rows * 2))
+        for i in range(num_images):
+            ax = axes[i // cols, i % cols]
+            img, label = self[np.random.randint(len(self))]
+            img = img.permute(1, 2, 0)  # Change shape from (C, H, W) to (H, W, C)
+            ax.imshow(np.asarray(img))
+            ax.set_title(self.classes[label], fontsize=8)
+            ax.axis('off')
+        plt.tight_layout()
+        plt.show()
+
+    def plot_breed_distribution(self):
+        breed_counts = self.stats()
+        breeds = [self.classes[breed] for breed in breed_counts.keys()]
+        counts = list(breed_counts.values())
+
+        plt.figure(figsize=(20, 10))
+        plt.bar(breeds, counts, color='skyblue')
+        plt.xlabel('Breeds')
+        plt.ylabel('Number of Images')
+        plt.xticks(rotation=90)
+        plt.title('Distribution of Dog Breeds in Dataset')
+        plt.show()
+
+    def plot_color_distribution(self, sample_size=100):
+        # Initialize lists to store RGB values
+        r_pixels, g_pixels, b_pixels = [], [], []
+
+        for _ in range(sample_size):
+            img, _ = self[np.random.randint(len(self))]
+            # Convert image to numpy array and normalize pixel values to [0, 1]
+            img_np = np.asarray(img.permute(1, 2, 0)) / 255.0
+            r_pixels.extend(img_np[:, :, 0].flatten())
+            g_pixels.extend(img_np[:, :, 1].flatten())
+            b_pixels.extend(img_np[:, :, 2].flatten())
+
+        # Plotting the color distributions
+        plt.figure(figsize=(12, 4))
+        plt.subplot(1, 3, 1)
+        plt.hist(r_pixels, bins=50, color='red', alpha=0.7)
+        plt.title('Red Channel Distribution')
+        plt.subplot(1, 3, 2)
+        plt.hist(g_pixels, bins=50, color='green', alpha=0.7)
+        plt.title('Green Channel Distribution')
+        plt.subplot(1, 3, 3)
+        plt.hist(b_pixels, bins=50, color='blue', alpha=0.7)
+        plt.title('Blue Channel Distribution')
+        plt.tight_layout()
+        plt.show()
+
+    def show_augmented_samples(self, num_samples=3, seed=0):
+        torch.manual_seed(seed)  # For reproducibility
+
+        # Define the augmentation transformations
+        augmentation_transforms = transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomRotation(30),
+            transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5)
+        ])
+
+        # Choose a few images at random
+        indices = torch.randperm(len(self))[:num_samples]
+        fig, axes = plt.subplots(2, num_samples, figsize=(15, 5))
+        axes = axes.flatten()
+
+        for i, idx in enumerate(indices):
+            img, label = self[idx]
+            img = transforms.ToPILImage()(img)
+            augmented_img = augmentation_transforms(img)
+
+            # Display original images
+            axes[i].imshow(np.asarray(img))
+            axes[i].set_title('Original - ' + self.classes[label])
+            axes[i].axis('off')
+
+            # Display augmented images
+            axes[i + num_samples].imshow(np.asarray(augmented_img))
+            axes[i + num_samples].set_title('Augmented - ' + self.classes[label])
+            axes[i + num_samples].axis('off')
+
+        plt.tight_layout()
+        plt.show()
+
 def main():
     dataset = DogImages(root=DATA_DIR, train=True, download=False, cropped=True, transform=transforms.ToTensor())
-
+    dataset.show_samples()
+    dataset.plot_breed_distribution()
+    dataset.plot_color_distribution()
+    dataset.show_augmented_samples()
     image, label = dataset[0]
     print(f'Image shape: {image.shape}, Label: {label}')
 
