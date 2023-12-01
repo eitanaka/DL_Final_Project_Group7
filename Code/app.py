@@ -9,14 +9,17 @@ Assignment: Final Project
 """
 
 
+
 import os
 import streamlit as st
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torchvision.utils import make_grid
+from PIL import Image
 import torchvision.transforms as transforms
 from train_DCGAN import Generator, Discriminator, weights_init  # Ensure this is correctly imported from your script
-from stanford_dogs_data import DogImages  # Ensure this is correctly imported from your script
+from stanford_dogs_data import DogImages  # Ensure this is correctly imported from your script# Ensure this is correctly imported from your script
 
 # Constants (you can make these configurable via the Streamlit interface as well)
 WORKERS = 2
@@ -146,4 +149,49 @@ if st.sidebar.button('Start Training'):
         train_dcgan(epochs, batch_size, lr, beta1, DATA_DIR, MODEL_DIR)
         st.success('Training completed!')
 
+
+# Function to load and display generated images
+def display_generated_images(model_dir, ngpu, nz, device):
+    # Initialize and load the generator model
+    netG = Generator(ngpu).to(device)
+    netG.load_state_dict(torch.load(os.path.join(model_dir, 'DCGAN_netG_final.pth')))
+    netG.eval()  # Set the model to evaluation mode
+
+    # Generate a batch of images
+    fixed_noise = torch.randn(64, nz, 1, 1, device=device)  # 64 images
+    with torch.no_grad():
+        fake_images = netG(fixed_noise).detach().cpu()
+
+    # Convert tensor to grid of images and display
+    grid = make_grid(fake_images, padding=2, normalize=True)
+    st.image(grid.permute(1, 2, 0).numpy(), caption='Generated Images')
+
+
+# Display generated images section
+st.header("Generated Images")
+if st.button('Show Generated Images'):
+    display_generated_images(MODEL_DIR, ngpu, NZ, device)
+
+
+# Display Training Loss
+st.header("Training Loss")
+loss_image_path = os.path.join(MODEL_DIR, 'DCGAN_loss.png')
+if os.path.exists(loss_image_path):
+    loss_image = Image.open(loss_image_path)
+    st.image(loss_image, caption='Training Loss')
+
+# Display Fake Images
+st.header("Generated Fake Images")
+fake_images_path = os.path.join(MODEL_DIR, 'DCGAN_fake_images.png')
+if os.path.exists(fake_images_path):
+    fake_images = Image.open(fake_images_path)
+    st.image(fake_images, caption='Fake Images')
+
+# Display Real vs Fake Images Comparison
+st.header("Real vs Fake Images")
+real_vs_fake_path = os.path.join(MODEL_DIR, 'DCGAN_real_vs_fake.png')
+if os.path.exists(real_vs_fake_path):
+    real_vs_fake_images = Image.open(real_vs_fake_path)
+    st.image(real_vs_fake_images, caption='Real vs Fake Images')
+    
 # Add additional Streamlit components as needed to display results, images, etc.
