@@ -9,7 +9,6 @@ Assignment: Final Project
 """
 
 
-
 import os
 import streamlit as st
 import torch
@@ -17,14 +16,11 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision.utils import make_grid
 from PIL import Image
-<<<<<<< HEAD
 from torchvision.transforms import ToPILImage
 import numpy as np
-=======
->>>>>>> 5b48a10f22b65abc7d57674e639e4fb9b5340835
 import torchvision.transforms as transforms
 from train_DCGAN import Generator, Discriminator, weights_init  # Ensure this is correctly imported from your script
-from stanford_dogs_data import DogImages  # Ensure this is correctly imported from your script# Ensure this is correctly imported from your script
+from stanford_dogs_data import DogImages  # Ensure this is correctly imported from your script
 
 # Constants (you can make these configurable via the Streamlit interface as well)
 WORKERS = 2
@@ -72,7 +68,6 @@ image_options = {
 selected_image_name = st.sidebar.selectbox('Select an Input Image', list(image_options.keys()))
 selected_image_path = image_options[selected_image_name]
 
-<<<<<<< HEAD
 # Display the selected image (optional)
 input_image = Image.open(selected_image_path)
 st.image(input_image, caption='Selected Input Image', use_column_width=True)
@@ -100,8 +95,6 @@ if st.sidebar.button('Generate Image'):
         st.image(output_image, caption='Generated Image', use_column_width=True)
 
         
-=======
->>>>>>> 5b48a10f22b65abc7d57674e639e4fb9b5340835
 
 # Function to load and display generated images
 def display_generated_images(model_dir, ngpu, nz, device):
@@ -111,11 +104,7 @@ def display_generated_images(model_dir, ngpu, nz, device):
     netG.eval()  # Set the model to evaluation mode
 
     # Generate a batch of images
-<<<<<<< HEAD
     fixed_noise = torch.randn(64, NZ , 1, 1, device=device)  # 64 images
-=======
-    fixed_noise = torch.randn(64, nz, 1, 1, device=device)  # 64 images
->>>>>>> 5b48a10f22b65abc7d57674e639e4fb9b5340835
     with torch.no_grad():
         fake_images = netG(fixed_noise).detach().cpu()
 
@@ -149,10 +138,4 @@ st.header("Real vs Fake Images")
 real_vs_fake_path = os.path.join(MODEL_DIR, 'DCGAN_real_vs_fake.png')
 if os.path.exists(real_vs_fake_path):
     real_vs_fake_images = Image.open(real_vs_fake_path)
-<<<<<<< HEAD
     st.image(real_vs_fake_images, caption='Real vs Fake Images')
-=======
-    st.image(real_vs_fake_images, caption='Real vs Fake Images')
-    
-# Add additional Streamlit components as needed to display results, images, etc.
->>>>>>> 5b48a10f22b65abc7d57674e639e4fb9b5340835
