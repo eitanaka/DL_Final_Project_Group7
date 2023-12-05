@@ -35,14 +35,14 @@ class TrainingConfig:
     image_size = 128  # the generated image resolution
     train_batch_size = 16
     eval_batch_size = 16  # how many images to sample during evaluation
-    num_epochs = 51
+    num_epochs = 5
     gradient_accumulation_steps = 1
     learning_rate = 1e-4
     lr_warmup_steps = 500
-    save_image_epochs = 20
-    save_model_epochs = 25
+    save_image_epochs = 4
+    save_model_epochs = 2
     mixed_precision = "fp16"  # `no` for float32, `fp16` for automatic mixed precision
-    output_dir = "DogDiffusion"  # the model name locally and on the HF Hub
+    output_dir = "dog_generation"  # the model name locally and on the HF Hub
 
     push_to_hub = True  # whether to upload the saved model to the HF Hub
     hub_model_id = "JeffreyHuLLaMA2/DogDiffusion"  # the name of the repository to create on the HF Hub
@@ -152,12 +152,9 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
         project_dir=os.path.join(config.output_dir, "logs"),
     )
     if accelerator.is_main_process:
-        print("Accelerator in process")
         if config.output_dir is not None:
             os.makedirs(config.output_dir, exist_ok=True)
-            print("Directory Made")
         if config.push_to_hub:
-            print("Repo will be made")
             repo_id = create_repo(
                 repo_id=config.hub_model_id or Path(config.output_dir).name, exist_ok=True
             ).repo_id
@@ -211,12 +208,12 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
 
         # After each epoch you optionally sample some demo images with evaluate() and save the model
         if accelerator.is_main_process:
-            print("Accelerator is in main again.")
             pipeline = DDPMPipeline(unet=accelerator.unwrap_model(model), scheduler=noise_scheduler)
 
             if (epoch + 1) % config.save_image_epochs == 0 or epoch == config.num_epochs - 1:
                 evaluate(config, epoch, pipeline)
 
+            if (epoch + 1) % config.save_model_epochs == 0 or epoch == config.num_epochs - 1:
                 if config.push_to_hub:
                     upload_folder(
                         repo_id=repo_id,
@@ -224,8 +221,8 @@ def train_loop(config, model, noise_scheduler, optimizer, train_dataloader, lr_s
                         commit_message=f"Epoch {epoch}",
                         ignore_patterns=["step_*", "epoch_*"],
                     )
-
-                pipeline.save_pretrained(config.output_dir)
+                else:
+                    pipeline.save_pretrained(config.output_dir)
 
 
 
