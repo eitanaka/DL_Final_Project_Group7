@@ -13,7 +13,20 @@ This project aims to generate realistic dog images using GANs, with a focus on D
 - `Individual-Project-Reports`: Contributions and reports from each team member.
 
 ## Installation and Usage
-(Instructions for setting up and running the project)
+
+1. **Clone the Repository**:
+   Clone the project from GitHub:
+   git clone https://github.com/eitanaka/DL_Final_Project_Group7.git
+
+2. **Run on GPU**:
+Ensure your system has a GPU for efficient model training.
+
+3. **Data Loading**:
+Use the `StanfordDogImage` class for loading the Stanford Dogs dataset.
+
+4. **Train DCGAN**:
+- Modify the constants and `main` function in the `train_DCGAN` script for hyperparameter tuning.
+- Update the dataset path as per your local setup.
 
 ## Contributors
 - Cody Yu
