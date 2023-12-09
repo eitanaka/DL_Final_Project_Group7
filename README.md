@@ -15,7 +15,8 @@ This project aims to generate realistic dog images using GANs, with a focus on D
 ## Installation and Usage
 
 1. **Clone the Repository**:
-   Clone the project from GitHub:
+   To start working with the project, clone it from GitHub using the following command:
+   ```bash
    git clone https://github.com/eitanaka/DL_Final_Project_Group7.git
 
 2. **Run on GPU**:
