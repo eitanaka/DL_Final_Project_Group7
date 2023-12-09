@@ -29,6 +29,15 @@ Use the `StanfordDogImage` class for loading the Stanford Dogs dataset.
 - Modify the constants and `main` function in the `train_DCGAN` script for hyperparameter tuning.
 - Update the dataset path as per your local setup.
 
+5. Install the dependencies, and log into huggingface with "huggingface-cli login" with your access token (read or write for uploading to hf)
+
+#sudo apt -qq install git-lfs
+#pip install diffusers[training]
+
+6. In the code, replace the hub_model_id and the output_dir in the class based off of what repository you want to save your model to.
+Also, change the hub_private_repo depending on what settings your hf is, and set push_to_hub to false if you don't want to push your model.
+
+
 ## Contributors
 - Cody Yu
 - Kismat Khatri
