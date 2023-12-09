@@ -16,7 +16,10 @@ This project aims to generate realistic dog images using GANs, with a focus on D
 (Instructions for setting up and running the project)
 
 ## Contributors
-- List of team members
+- Cody Yu
+- Kismat Khatri
+- Jeffrey Hu
+- Ei Tanaka
 
 ## License
 (Information about the license, if applicable)
